@@ -1,98 +1,118 @@
-import { StackScreenProps } from "@react-navigation/stack";
 import React, { useState } from "react";
-import {
-  ImageBackground,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { TitleComponent } from "../components/TitleComponent";
+import { Alert, StatusBar, Text, TouchableOpacity, View } from "react-native";
+import { BodyComponent } from "../components/BodyComponent";
+import { PRIMARY_COLOR } from "../common/constantsColor";
+import { styles } from "../../theme/AppTheme";
+import { InputComponent } from "../components/InputComponent";
+import { ButtonComponent } from "../components/ButtonComponent";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import { CommonActions, useNavigation } from "@react-navigation/native";
 
-interface Props extends StackScreenProps<any, any> {}
-const imagen = {uri: 'https://img.freepik.com/foto-gratis/vista-superior-delicioso-bakso-indonesio_23-2148933346.jpg?t=st=1722725974~exp=1722729574~hmac=ef5cf147b2fbf17f97c4c4ed3467a29ee15214d04f10e2b34bf06ad58769b27f&w=360'}
+interface FormLogin {
+  email: string;
+  password: string;
+}
 
-export const Login = ({ navigation }: Props) => {
+interface User {
+  nombre: string;
+  apellido: string;
+  cedula: string;
+  email: string;
+  password: string;
+}
+
+export const Login = () => {
+  const users: User[] = [
+    {
+      nombre: "Augusto",
+      apellido: "Viteri",
+      cedula: "0202496477",
+      email: "augustoviteri98@gmail.com",
+      password: "12345678",
+    },
+    {
+      nombre: "Janella",
+      apellido: "Flores",
+      cedula: "0200873479",
+      email: "janellaflores@gmail.com",
+      password: "12345678",
+    },
+  ];
+
+  const [formLogin, setFormLogin] = useState<FormLogin>({
+    email: "",
+    password: "",
+  });
+
+  const [hiddenPassword, setHiddenPassword] = useState<boolean>(true);
+
+  const navigation = useNavigation();
+
+  const handleSetValues = (name: string, value: string) => {
+    setFormLogin({ ...formLogin, [name]: value });
+  };
+
+  const handleSignIn = () => {
+    if (formLogin.email === "" || formLogin.password === "") {
+      Alert.alert("Error", "Por favor, completar todos los campos!");
+      return;
+    }
+
+    if(!verifyUser()) {
+      Alert.alert(
+        "Error",
+        "Correo y/o contraseña incorrecta"
+      );
+      return
+    }
+    console.log(formLogin);
+  };
+
+  const verifyUser = (): User => {
+    const existUser = users.filter(user=> user.email===formLogin.email && user.password === formLogin.password)[0];
+    return existUser;
+  };
 
   return (
-    <View style={styles.container}>
-      <ImageBackground source={imagen} style={styles.imagen}>
-        <View style={styles.content}>
-          <Text style={styles.title}>Iniciar sesión</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Correo electrónico"
-            placeholderTextColor="white"
-            keyboardType="email-address"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Contraseña"
-            placeholderTextColor="white"
-            secureTextEntry
-          />
-          <TouchableOpacity style={styles.button} >
-            <Text style={styles.buttonText}>Acceder</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("SignUp")}>
-            <Text style={styles.buttonText}>Registrarse</Text>
-          </TouchableOpacity>
-          <Text style={styles.or}>o</Text>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
-            <Text style={styles.buttonText}>Volver</Text>
-          </TouchableOpacity>
+    <View>
+      <StatusBar backgroundColor={PRIMARY_COLOR} />
+      <TitleComponent title="Iniciar Sesión" />
+      <BodyComponent>
+        <View>
+          <Text style={styles.title}>Bienvenido de nuevo!</Text>
+          <Text style={styles.subtitle}>
+            Realiza tus compras de forma segura
+          </Text>
         </View>
-      </ImageBackground>
+        <View style={styles.contentInput}>
+          <InputComponent
+            placeholder="Correo"
+            handleSetValues={handleSetValues}
+            name="email"
+          />
+          <View>
+            <InputComponent
+              placeholder="Contraseña"
+              handleSetValues={handleSetValues}
+              name="password"
+              isPassword={hiddenPassword}
+            />
+            <Icon
+              style={styles.iconPassword}
+              name="visibility"
+              size={25}
+              color={PRIMARY_COLOR}
+              onPress={() => setHiddenPassword(!hiddenPassword)}
+            />
+          </View>
+        </View>
+        <ButtonComponent textButton="Iniciar" actionButton={handleSignIn} />
+        <TouchableOpacity 
+        onPress={()=> navigation.dispatch(CommonActions.navigate({name: 'Register'}))}>
+          <Text style={styles.textRedirect}>No tienes cuenta? Regístrate ahora</Text>
+        </TouchableOpacity>
+      </BodyComponent>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  imagen: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 10,
-    paddingTop: 60,
-  },
-  title: {
-    fontSize: 30,
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    paddingBottom: 40,
-  },
-  input: {
-    width: '80%',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)', 
-    color: 'white',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 5,
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  buttonText: {
-    color: 'black',
-    fontSize: 16,
-  },
-  or: {
-    color: 'white',
-    fontSize: 16,
-    paddingBottom: 10,
-    textAlign: 'center',
-  },
-});
