@@ -26,7 +26,7 @@ export const Welcome = () => {
         }}
         style={styles.imagen}
       ></Image>
-      <Text style={styles.textRedirect}>Un oasis de colores</Text>
+      <Text style={styles.textRedirect}>Un oasis de sabores</Text>
       <View style={styles.containerButton}>
         <TouchableOpacity
           style={styles.button}
